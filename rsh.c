@@ -38,6 +38,13 @@ void sendmsg (char *user, char *target, char *msg) {
 	strcpy(m.target, target);
 	strcpy(m.msg, msg);
 
+	// how can i trim trailing space
+	int len = strlen(m.msg);
+	
+	if (len > 0 && m.msg[len - 1] == ' ') {
+ 		m.msg[len - 1] = '\0';
+	}
+
 	int fd = open("serverFIFO", O_WRONLY);
 	if (fd < 0) {
 		perror("open serverFIFO");

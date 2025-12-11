@@ -38,13 +38,6 @@ void sendmsg (char *user, char *target, char *msg) {
 	strcpy(m.target, target);
 	strcpy(m.msg, msg);
 
-	// how can i trim trailing space
-	int len = strlen(m.msg);
-	
-	if (len > 0 && m.msg[len - 1] == ' ') {
- 		m.msg[len - 1] = '\0';
-	}
-
 	int fd = open("serverFIFO", O_WRONLY);
 	if (fd < 0) {
 		perror("open serverFIFO");
@@ -66,16 +59,15 @@ void* messageListener(void *arg) {
 	char fifo_path[100];
 	sprintf(fifo_path, "%s", (char*)arg);
 	mkfifo(fifo_path, 0666);
-	
+	int fd = open(fifo_path, O_RDONLY);
 	for (;;) {
-		int fd = open(fifo_path, O_RDONLY);
 		struct message m;
 		if (read(fd, &m, sizeof(struct message)) > 0) {
-			printf("Incoming message from %s: %s \n", m.source, m.msg);
+			printf("Incoming message from %s: %s\n", m.source, m.msg);
 			fflush(stdout);
 		}	
-		close(fd);
 	}	
+	close(fd);
 
 	pthread_exit((void*)0);
 }
